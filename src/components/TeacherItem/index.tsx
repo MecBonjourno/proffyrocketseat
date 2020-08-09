@@ -3,31 +3,52 @@ import React from 'react';
 import './styles.css'
 
 import whatsappIcon from '../../assets/images/icons/whatsapp.svg'
+import api from '../../services/api';
 
-function TeacherItem () {
+export interface Teacher {
+    id: number;
+    avatar: string; 
+    bio: string;
+    cost: number; 
+    name: string;
+    subject: string;
+    whatsapp: string;
+}
+interface TeacherItemProps {
+    teacher: Teacher;
+}
+
+const TeacherItem: React.FC<TeacherItemProps> = ({teacher}) => {
+
+    function createNewConnection(){
+        api.post('connections', {
+            user_id: teacher.id,
+        })
+    }
+
     return (
         <article className="teacher-item">
         <header>
-            <img src="https://scontent.fudi1-1.fna.fbcdn.net/v/t1.0-9/19106040_1320004351440855_1343920671894378555_n.jpg?_nc_cat=110&_nc_sid=85a577&_nc_ohc=ceWEzo9tRysAX9aLb-D&_nc_ht=scontent.fudi1-1.fna&oh=b3162dc8253570c8337cec3f0f24e700&oe=5F50656A"></img>
+            <img src={teacher.avatar} alt={teacher.name}></img>
             <div>
-                <strong>Guilherme Zago</strong>
-                <span>React Native</span>
+                <strong>{teacher.name}</strong>
+                <span>{teacher.subject}</span>
             </div>    
         </header>
-        <p>Zago é o cara do código da gurizada sempre disponiveis pra um novo projeto!
+        <p>{teacher.bio}
             <br /><br />
-            É isso memo
+           
         </p>
 
         <footer>
             <p>
                 Preço/Hora
-                <strong>R$ 200,00</strong>
+                <strong>R$ {teacher.cost}</strong>
             </p>
-            <button type="button">
+            <a target="_blank" onClick={createNewConnection} href={`https://wa.me/${teacher.whatsapp}`}>
                 <img src={whatsappIcon}/>
                 Entrar em Contato
-            </button>
+            </a>
             </footer>
         </article>
     )

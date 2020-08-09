@@ -1,22 +1,46 @@
-import React from 'react';
+import React, { useState, FormEvent } from 'react';
 
 import './styles.css'
 
 import PageHeader from '../../../components/PageHeader';
 
 // import whatsappIcon from '../../images/icons/whatsapp.svg'
-import TeacherItem from '../../../components/TeacherItem';
+import TeacherItem, {Teacher} from '../../../components/TeacherItem';
 import Input from '../../../components/Input';
 import Select from '../../../components/Select';
+import api from '../../../services/api';
+
 
 function TeacherList(){
+    const [teachers, setTeacher]=useState([]);
+
+    const [subject, setSubject] = useState('');
+    const [week_day, setWeekDay] = useState('');
+    const [time, setTime] = useState('');
+
+    async function searchTeachers(e: FormEvent){
+        e.preventDefault();
+
+      const response = await api.get('classes', {
+            params: {
+                subject,
+                week_day,
+                time,
+            }
+        })
+        
+        setTeacher(response.data);
+    }
+
     return (
         <div id="page-teacher-list" className="container">
             <PageHeader title="Estes Proffys estão disponiveis">
-                <form id="search-teachers">
+                <form id="search-teachers" onSubmit={searchTeachers}>
                 <Select 
                 name="subject" 
                 label="Matéria" 
+                value={subject}
+                onChange = {(e)=> {setSubject(e.target.value)} }
                 options={[ 
                     { value: 'Artes', label: 'Artes' }, 
                     { value: 'Ciências', label: 'Ciências' }, 
@@ -25,14 +49,16 @@ function TeacherList(){
                     { value: 'Geografia', label: 'Geografia' }, 
                     { value: 'Física', label: 'Física' }, 
                     { value: 'História', label: 'História' }, 
-                    { value: 'Matemática', label: 'Matemáticamatemática' }, 
+                    { value: 'Matemática', label: 'Matemática' }, 
                     { value: 'Português', label: 'Português' }, 
                     { value: 'Química', label: 'Química' }, 
                     { value: 'Inglês', label: 'Inglês' }, 
                     ]}/>
                     <Select 
-                name="week_dat" 
+                name="week_day" 
                 label="Dia da Semana" 
+                value={week_day}
+                onChange = {(e)=> {setWeekDay(e.target.value)} }
                 options={[ 
                     { value: '0', label: 'Domingo' }, 
                     { value: '1', label: 'Segunda' }, 
@@ -42,15 +68,17 @@ function TeacherList(){
                     { value: '5', label: 'Sexta' }, 
                     { value: '6', label: 'Sábado' }, 
                      ]}/>
-                    <Input type="time" name="Time" label="Hora" />
+                    <Input type="time" name="Time" label="Hora"  value={time}
+                         onChange = {(e)=> {setTime(e.target.value)} }/>
+                         <button type="submit" >Buscar</button>
                 </form>
             </PageHeader>
 
             <main>
-                <TeacherItem />
-                <TeacherItem />
-                <TeacherItem />
-                <TeacherItem />
+                {teachers.map((teacher: Teacher)=>{
+                    return <TeacherItem key={teacher.id} teacher={teacher} />
+                })}
+                
             </main>
 
         </div>
